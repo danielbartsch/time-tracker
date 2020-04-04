@@ -1,8 +1,8 @@
 import { addDays, getEasterDate, isEqual } from './date'
 
-export const weekDays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+export const weekDays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
 
-export const workDays = [1, 2, 3, 4, 5];
+export const workDays = [1, 2, 3, 4, 5]
 export const weekendDays = [6, 0]
 
 export const holidays: Array<[string, ((date: Date) => boolean)]> = [
