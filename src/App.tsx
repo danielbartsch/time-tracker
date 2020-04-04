@@ -131,7 +131,7 @@ const App = () => {
                     <Day value={date} />
                   </DayStyle>
                 </td>
-                <td>{todaysHolidays ? "o" : undefined}</td>
+                <td>{todaysHolidays.length > 0 ? "o" : undefined}</td>
                 <td>
                   {isWorkday && todaysHolidays.length === 0 ? "o" : undefined}
                 </td>
