@@ -25,3 +25,8 @@ export const holidays: Array<[string, ((date: Date) => boolean)]> = [
     ['Stefanitag', (date) => { return date.getMonth() === 11 && date.getDate() === 26 }],
     ['Silvester', (date) => { return date.getMonth() === 11 && date.getDate() === 31 }],
 ]
+
+export const birthdays: Array<[string, Date]> = [
+    ['Daniel Bartsch', new Date(1996, 0, 9)],
+    ['Daniel Bartsch', new Date(1996, 0, 1)],
+]

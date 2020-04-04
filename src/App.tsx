@@ -1,6 +1,6 @@
 import React from "react";
-import { workDays, weekendDays, holidays, weekDays } from "./config";
-import { addDays, getEasterDate } from "./date";
+import { workDays, weekendDays, holidays, weekDays, birthdays } from "./config";
+import { addDays } from "./date";
 import "./App.css";
 
 const getDateWithoutTime = (datetime: Date) =>
@@ -26,6 +26,38 @@ const Day = ({ value }: { value: Date }) => (
     {padNumber(value.getMonth() + 1, 2)}-{padNumber(value.getDate(), 2)}
   </>
 );
+
+const DayStyle = ({
+  children,
+  todaysHolidays,
+  todaysBirthdays,
+}: {
+  children: React.ReactNode;
+  todaysHolidays: Array<string>;
+  todaysBirthdays: Array<[string, Date]>;
+}) => {
+  let textColor = undefined;
+  if (todaysHolidays.length > 0) {
+    textColor = "green";
+  }
+  if (todaysBirthdays.length > 0) {
+    textColor = "#fc0";
+  }
+
+  let tooltip = todaysHolidays.slice();
+  if (tooltip.length > 0 && todaysBirthdays.length > 0) {
+    tooltip.push("und");
+  }
+  tooltip.push(...todaysBirthdays.map(([name, birthday]) => name));
+  return (
+    <code
+      title={tooltip.join(" ")}
+      style={textColor ? { color: textColor } : undefined}
+    >
+      {children}
+    </code>
+  );
+};
 
 const App = () => {
   const [startDay, setStartDay] = React.useState(
@@ -71,20 +103,25 @@ const App = () => {
 
             const todaysHolidays = holidays
               .filter(([, isHoliday]) => isHoliday(date))
-              .map(([name]) => name)
-              .join();
+              .map(([name]) => name);
+
+            const todaysBirthdays = birthdays.filter(
+              ([, birthday]) =>
+                birthday.getMonth() === date.getMonth() &&
+                birthday.getDate() === date.getDate()
+            );
 
             const isWorkday = workDays.includes(date.getDay());
             const isWeekend = weekendDays.includes(date.getDay());
             return (
               <tr key={`${date}`}>
                 <td className="date">
-                  <code
-                    title={todaysHolidays}
-                    style={todaysHolidays ? { color: "green" } : undefined}
+                  <DayStyle
+                    todaysHolidays={todaysHolidays}
+                    todaysBirthdays={todaysBirthdays}
                   >
                     <Day value={date} />
-                  </code>
+                  </DayStyle>
                 </td>
                 <td>{todaysHolidays ? "o" : undefined}</td>
                 <td>{isWorkday && !todaysHolidays ? "o" : undefined}</td>
