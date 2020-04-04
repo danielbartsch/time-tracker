@@ -1,7 +1,6 @@
 import React from "react";
 import { workDays, weekendDays, holidays, weekDays, birthdays } from "./config";
 import { addDays } from "./date";
-import "./App.css";
 
 const getDateWithoutTime = (datetime: Date) =>
   new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate());

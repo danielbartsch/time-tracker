@@ -20,3 +20,22 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+tr:nth-child(even) {
+  background-color: #2228;
+}
+
+tr:nth-child(odd) {
+  background-color: #3338;
+}
+
+td {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+td.date {
+  text-align: end;
+}
