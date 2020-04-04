@@ -29,10 +29,12 @@ const Day = ({ value }: { value: Date }) => (
 
 const DayStyle = ({
   children,
+  date,
   todaysHolidays,
   todaysBirthdays,
 }: {
   children: React.ReactNode;
+  date: Date;
   todaysHolidays: Array<string>;
   todaysBirthdays: Array<[string, Date]>;
 }) => {
@@ -48,7 +50,12 @@ const DayStyle = ({
   if (tooltip.length > 0 && todaysBirthdays.length > 0) {
     tooltip.push("und");
   }
-  tooltip.push(...todaysBirthdays.map(([name, birthday]) => name));
+  tooltip.push(
+    ...todaysBirthdays.map(
+      ([name, birthday]) =>
+        `${name} (${date.getFullYear() - birthday.getFullYear()})`
+    )
+  );
   return (
     <code
       title={tooltip.join(" ")}
@@ -108,7 +115,8 @@ const App = () => {
             const todaysBirthdays = birthdays.filter(
               ([, birthday]) =>
                 birthday.getMonth() === date.getMonth() &&
-                birthday.getDate() === date.getDate()
+                birthday.getDate() === date.getDate() &&
+                date.getFullYear() >= birthday.getFullYear()
             );
 
             const isWorkday = workDays.includes(date.getDay());
@@ -117,6 +125,7 @@ const App = () => {
               <tr key={`${date}`}>
                 <td className="date">
                   <DayStyle
+                    date={date}
                     todaysHolidays={todaysHolidays}
                     todaysBirthdays={todaysBirthdays}
                   >
@@ -124,7 +133,9 @@ const App = () => {
                   </DayStyle>
                 </td>
                 <td>{todaysHolidays ? "o" : undefined}</td>
-                <td>{isWorkday && !todaysHolidays ? "o" : undefined}</td>
+                <td>
+                  {isWorkday && todaysHolidays.length === 0 ? "o" : undefined}
+                </td>
                 <td>{isWeekend ? "o" : undefined}</td>
               </tr>
             );
