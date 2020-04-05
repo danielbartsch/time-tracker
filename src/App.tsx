@@ -57,28 +57,75 @@ const DayStyle = ({
   )
 }
 
+const useEventListener = (event: string, listener: (event: any) => void) => {
+  React.useEffect(() => {
+    return document.addEventListener(event, listener)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+const useTouchDrag = (
+  [stepX, stepY]: [number, number],
+  listener: (xDelta: number, yDelta: number) => void
+) => {
+  const touchStart = React.useRef<{ x: number; y: number }>()
+
+  useEventListener('touchstart', (event: TouchEvent) => {
+    const { pageX: x, pageY: y } = event.touches[0]
+    touchStart.current = { x, y }
+  })
+  useEventListener('touchmove', (event: TouchEvent) => {
+    const { pageX: x, pageY: y } = event.touches[0]
+
+    if (touchStart.current) {
+      const [deltaX, deltaY] = [x - touchStart.current.x, y - touchStart.current.y]
+      if (Math.abs(deltaX) >= stepX) {
+        touchStart.current = { x, y: touchStart.current.y }
+      }
+      if (Math.abs(deltaY) >= stepY) {
+        touchStart.current = { x: touchStart.current.x, y }
+      }
+      listener(deltaX, deltaY)
+    }
+  })
+}
+
 const App = () => {
   const [startDay, setStartDay] = React.useState(getDateWithoutTime(new Date()))
   const [shownDays, setDays] = React.useState(30)
 
-  React.useEffect(() => {
-    return document.addEventListener('wheel', event => {
-      if (event.deltaY !== 0) {
-        setStartDay(previousStartDay => addDays(previousStartDay, event.deltaY))
-      }
-      if (event.deltaX !== 0) {
-        setDays(prevDays => {
-          if (prevDays + event.deltaX < 1) {
-            return 1
-          }
-          if (prevDays + event.deltaX > 100) {
-            return 100
-          }
-          return prevDays + event.deltaX
-        })
-      }
-    })
-  }, [])
+  useEventListener('wheel', (event: WheelEvent) => {
+    if (event.deltaY !== 0) {
+      setStartDay(previousStartDay => addDays(previousStartDay, event.deltaY))
+    }
+    if (event.deltaX !== 0) {
+      setDays(prevDays => {
+        if (prevDays + event.deltaX < 1) {
+          return 1
+        }
+        if (prevDays + event.deltaX > 100) {
+          return 100
+        }
+        return prevDays + event.deltaX
+      })
+    }
+  })
+  useTouchDrag([30, 30], (x, y) => {
+    if (Math.abs(x) > 0) {
+      setDays(prevDays => {
+        const deltaXSteps = Math.round(-x / 30)
+        if (prevDays + deltaXSteps < 1) {
+          return 1
+        }
+        if (prevDays + deltaXSteps > 100) {
+          return 100
+        }
+        return prevDays + deltaXSteps
+      })
+    }
+    if (Math.abs(y) > 30) {
+      setStartDay(previousStartDay => addDays(previousStartDay, Math.round(-y / 30)))
+    }
+  })
 
   return (
     <div className="App">
@@ -88,7 +135,7 @@ const App = () => {
             <th>Datum</th>
             <th>Feiertag</th>
             <th>Geburtstag</th>
-            <th>Arbeit</th>
+            <th>Werktag</th>
             <th>Wochenende</th>
           </tr>
         </thead>
