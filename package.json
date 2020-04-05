@@ -70,6 +70,17 @@
     "start": "BROWSER=firefox node scripts/start.js",
     "build": "node scripts/build.js"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "avoid"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -139,5 +150,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^2.0.2"
   }
 }
