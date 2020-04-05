@@ -6,7 +6,7 @@ export const workDays = [1, 2, 3, 4, 5]
 export const weekendDays = [6, 0]
 
 export const holidays: Array<[string, (date: Date) => boolean]> = [
-    /* austrian holidays */
+  /* austrian holidays */
   ['Neujahr', date => date.getMonth() === 0 && date.getDate() === 1],
   ['Heilige Drei Könige', date => date.getMonth() === 0 && date.getDate() === 6],
   ['Ostersonntag', date => isEqual(getEasterDate(date), date)],

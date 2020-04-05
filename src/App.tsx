@@ -58,16 +58,14 @@ const DayStyle = ({
 }
 
 const useEventListener = (event: string, listener: (event: any) => void) => {
-  React.useEffect(() => {
-    return document.addEventListener(event, listener)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => document.addEventListener(event, listener), []) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 const useTouchDrag = (
   [stepX, stepY]: [number, number],
   listener: (xDelta: number, yDelta: number) => void
 ) => {
-  const touchStart = React.useRef<{ x: number; y: number }>()
+  const touchStart = React.useRef<{ x: number; y: number } | null>()
 
   useEventListener('touchstart', (event: TouchEvent) => {
     const { pageX: x, pageY: y } = event.touches[0]
@@ -86,6 +84,9 @@ const useTouchDrag = (
       }
       listener(deltaX, deltaY)
     }
+  })
+  useEventListener('touchend', (event: TouchEvent) => {
+    touchStart.current = null
   })
 }
 
