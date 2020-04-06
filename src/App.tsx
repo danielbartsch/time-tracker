@@ -129,64 +129,62 @@ const App = () => {
   })
 
   return (
-    <div className="App">
-      <table>
-        <thead>
-          <tr>
-            <th>Datum</th>
-            <th>Feiertag</th>
-            <th>Geburtstag</th>
-            <th>Werktag</th>
-            <th>Wochenende</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: shownDays }).map((_, index) => {
-            const date = addDays(startDay, index)
+    <table style={{ width: '100%' }}>
+      <thead>
+        <tr>
+          <th style={{ width: 150 }}>Datum</th>
+          <th style={{ width: 150 }}>Feiertag</th>
+          <th>Geburtstag</th>
+          <th style={{ width: 20 }}>Werktag</th>
+          <th style={{ width: 20 }}>Wochenende</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: shownDays }).map((_, index) => {
+          const date = addDays(startDay, index)
 
-            const todaysHolidays = holidays
-              .filter(([, isHoliday]) => isHoliday(date))
-              .map(([name]) => name)
+          const todaysHolidays = holidays
+            .filter(([, isHoliday]) => isHoliday(date))
+            .map(([name]) => name)
 
-            const todaysBirthdays = birthdays.filter(
-              ([, birthday]) =>
-                birthday.getMonth() === date.getMonth() &&
-                birthday.getDate() === date.getDate() &&
-                date.getFullYear() >= birthday.getFullYear()
-            )
+          const todaysBirthdays = birthdays.filter(
+            ([, birthday]) =>
+              birthday.getMonth() === date.getMonth() &&
+              birthday.getDate() === date.getDate() &&
+              date.getFullYear() >= birthday.getFullYear()
+          )
 
-            const isWorkday = workDays.includes(date.getDay())
-            const isWeekend = weekendDays.includes(date.getDay())
-            return (
-              <tr key={`${date}`}>
-                <td className="date">
-                  <DayStyle
-                    date={date}
-                    todaysHolidays={todaysHolidays}
-                    todaysBirthdays={todaysBirthdays}
-                  >
-                    <Day value={date} />
-                  </DayStyle>
-                </td>
-                <td>{todaysHolidays.length > 0 ? todaysHolidays.join(', ') : undefined}</td>
-                <td>
-                  {todaysBirthdays.length > 0
-                    ? todaysBirthdays
-                        .map(
-                          ([name, birthday]) =>
-                            `${name} (${date.getFullYear() - birthday.getFullYear()})`
-                        )
-                        .join(', ')
-                    : undefined}
-                </td>
-                <td>{isWorkday && todaysHolidays.length === 0 ? 'o' : undefined}</td>
-                <td>{isWeekend ? 'o' : undefined}</td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+          const isWorkday = workDays.includes(date.getDay())
+          const isWeekend = weekendDays.includes(date.getDay())
+          return (
+            <tr key={`${date}`}>
+              <td className="date">
+                <DayStyle
+                  date={date}
+                  todaysHolidays={todaysHolidays}
+                  todaysBirthdays={todaysBirthdays}
+                >
+                  <Day value={date} />
+                </DayStyle>
+              </td>
+              <td>{todaysHolidays.length > 0 ? todaysHolidays.join(', ') : undefined}</td>
+              <td>
+                {todaysBirthdays.length > 0
+                  ? todaysBirthdays
+                      .map(
+                        ([name, birthday]) =>
+                          `${name} (${date.getFullYear() - birthday.getFullYear()})`
+                      )
+                      .join(', ')
+                  : undefined}
+              </td>
+              <td>{isWorkday && todaysHolidays.length === 0 ? 'o' : undefined}</td>
+              <td>{isWeekend ? 'o' : undefined}</td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
   )
 }
 
