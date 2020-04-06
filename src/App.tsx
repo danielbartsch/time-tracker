@@ -15,22 +15,12 @@ const padNumber = (number: number, pad: number, zeros: boolean = true): string =
     .join('')}${number}`
 }
 
-const Day = ({ value, format = 'dw. yyyy-mm-dd' }: { value: Date; format?: string }) => {
-  let resultString = format
-  if (resultString.includes('dw')) {
-    resultString = resultString.replace('dw', weekDays[value.getDay()])
-  }
-  if (resultString.includes('yyyy')) {
-    resultString = resultString.replace('yyyy', padNumber(value.getFullYear(), 4))
-  }
-  if (resultString.includes('mm')) {
-    resultString = resultString.replace('mm', padNumber(value.getMonth() + 1, 2))
-  }
-  if (resultString.includes('dd')) {
-    resultString = resultString.replace('dd', padNumber(value.getDate(), 2))
-  }
-  return <>{resultString}</>
-}
+const Day = ({ value }: { value: Date }) => (
+  <>
+    {weekDays[value.getDay()]}. {padNumber(value.getFullYear(), 4)}-
+    {padNumber(value.getMonth() + 1, 2)}-{padNumber(value.getDate(), 2)}
+  </>
+)
 
 const DayStyle = ({
   children,
@@ -100,26 +90,6 @@ const useTouchDrag = (
   })
 }
 
-const getDateFormats = ({
-  isSameYear,
-  isSameMonth,
-}: {
-  isSameYear: boolean
-  isSameMonth: boolean
-}): { header: string; rows: string } => {
-  let headerFormat = 'Datum'
-  let rowFormat = 'dw. yyyy-mm-dd'
-  if (isSameYear) {
-    headerFormat = 'yyyy'
-    rowFormat = rowFormat.replace('yyyy-', '     ')
-  }
-  if (isSameMonth) {
-    headerFormat += '-mm'
-    rowFormat = rowFormat.replace('mm-', '   ')
-  }
-  return { header: headerFormat, rows: rowFormat }
-}
-
 const App = () => {
   const [startDay, setStartDay] = React.useState(getDateWithoutTime(new Date()))
   const [shownDays, setDays] = React.useState(30)
@@ -158,19 +128,11 @@ const App = () => {
     }
   })
 
-  const lastDay = addDays(startDay, shownDays - 1)
-  const { header, rows } = getDateFormats({
-    isSameYear: startDay.getFullYear() === lastDay.getFullYear(),
-    isSameMonth: startDay.getMonth() === lastDay.getMonth(),
-  })
-
   return (
     <table style={{ width: '100%' }}>
       <thead>
         <tr>
-          <th style={{ width: 150 }}>
-            <Day value={startDay} format={header} />
-          </th>
+          <th style={{ width: 150 }}>Datum</th>
           <th style={{ width: 150 }}>Feiertag</th>
           <th>Geburtstag</th>
           <th style={{ width: 20 }}>Werktag</th>
@@ -205,7 +167,7 @@ const App = () => {
                   todaysHolidays={todaysHolidays}
                   todaysBirthdays={todaysBirthdays}
                 >
-                  <Day value={date} format={rows} />
+                  <Day value={date} />
                 </DayStyle>
               </td>
               <td>{todaysHolidays.length > 0 ? todaysHolidays.join(', ') : undefined}</td>
