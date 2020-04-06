@@ -1,6 +1,6 @@
 import React from 'react'
 import { workDays, weekendDays, holidays, weekDays, birthdays } from './config'
-import { addDays } from './date'
+import { addDays, isEqual } from './date'
 
 const getDateWithoutTime = (datetime: Date) =>
   new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate())
@@ -157,7 +157,10 @@ const App = () => {
           const isWorkday = workDays.includes(date.getDay())
           const isWeekend = weekendDays.includes(date.getDay())
           return (
-            <tr key={`${date}`}>
+            <tr
+              key={`${date}`}
+              style={isEqual(date, new Date()) ? { backgroundColor: '#343' } : undefined}
+            >
               <td className="date">
                 <DayStyle
                   date={date}
