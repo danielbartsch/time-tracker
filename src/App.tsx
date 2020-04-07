@@ -65,6 +65,21 @@ const WorkTimes = ({ value: [[start, end], ...breaks] }: { value: WorkTime }) =>
           </React.Fragment>
         ))}
       </td>
+      <td>
+        <Time
+          value={
+            new Date(
+              end.getTime() -
+                start.getTime() -
+                breaks.reduce(
+                  (sum, [breakStart, breakEnd]) =>
+                    sum + (breakEnd.getTime() - breakStart.getTime()),
+                  0
+                )
+            )
+          }
+        />
+      </td>
     </>
   )
 }
@@ -148,6 +163,7 @@ const App = () => {
           <th>Arbeitsbeginn</th>
           <th>Arbeitsende</th>
           <th>Pausen</th>
+          <th>Arbeitszeit</th>
           <th>Notizen</th>
           <th>Werktag</th>
           <th>Wochenende</th>
@@ -180,6 +196,7 @@ const App = () => {
                 <WorkTimes value={defaultWorkTimes[weekDay]} />
               ) : (
                 <>
+                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>
