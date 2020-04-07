@@ -2,7 +2,32 @@ import { addDays, getEasterDate, isEqual } from './date'
 
 export const weekDays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
 
-export const workDays = [1, 2, 3, 4, 5]
+export type DayIndex = 1 | 2 | 3 | 4 | 5 | 6 | 0
+
+export const defaultWorkTimes: { [key in DayIndex]: Array<[Date, Date]> } = {
+  1: [
+    [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
+    [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],
+  ],
+  2: [
+    [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
+    [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],
+  ],
+  3: [
+    [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
+    [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],
+  ],
+  4: [
+    [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
+    [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],
+  ],
+  5: [
+    [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
+    [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],
+  ],
+  6: [],
+  0: [],
+}
 export const weekendDays = [6, 0]
 
 export const holidays: Array<[string, (date: Date) => boolean]> = [

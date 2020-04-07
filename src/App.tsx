@@ -1,5 +1,5 @@
 import React from 'react'
-import { workDays, weekendDays, holidays, weekDays } from './config'
+import { defaultWorkTimes, weekendDays, holidays, weekDays, DayIndex } from './config'
 import { addDays, isEqual } from './date'
 
 const getDateWithoutTime = (datetime: Date) =>
@@ -24,11 +24,9 @@ const Day = ({ value }: { value: Date }) => (
 
 const DayStyle = ({
   children,
-  date,
   todaysHolidays,
 }: {
   children: React.ReactNode
-  date: Date
   todaysHolidays: Array<string>
 }) => {
   let textColor = undefined
@@ -76,6 +74,8 @@ const useTouchDrag = (
     touchStart.current = null
   })
 }
+
+const workDays = Object.keys(defaultWorkTimes).map(Number)
 
 const App = () => {
   const [startDay, setStartDay] = React.useState(getDateWithoutTime(new Date()))
@@ -136,15 +136,18 @@ const App = () => {
             .filter(([, isHoliday]) => isHoliday(date))
             .map(([name]) => name)
 
-          const isWorkday = workDays.includes(date.getDay()) && todaysHolidays.length === 0
-          const isWeekend = weekendDays.includes(date.getDay())
+          const weekDay = date.getDay() as DayIndex
+          const [workTime, ...breaks] = defaultWorkTimes[weekDay]
+
+          const isWorkday = workDays.includes(weekDay) && todaysHolidays.length === 0
+          const isWeekend = weekendDays.includes(weekDay)
           return (
             <tr
               key={`${date}`}
               style={isEqual(date, new Date()) ? { backgroundColor: '#343' } : undefined}
             >
               <td className="date">
-                <DayStyle date={date} todaysHolidays={todaysHolidays}>
+                <DayStyle todaysHolidays={todaysHolidays}>
                   <Day value={date} />
                 </DayStyle>
               </td>
