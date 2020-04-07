@@ -3,8 +3,9 @@ import { addDays, getEasterDate, isEqual } from './date'
 export const weekDays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
 
 export type DayIndex = 1 | 2 | 3 | 4 | 5 | 6 | 0
+export type WorkTime = Array<[Date, Date]>
 
-export const defaultWorkTimes: { [key in DayIndex]: Array<[Date, Date]> } = {
+export const defaultWorkTimes: { [key in DayIndex]: WorkTime } = {
   1: [
     [new Date(0, 0, 0, 8, 0, 0, 0), new Date(0, 0, 0, 16, 0, 0, 0)],
     [new Date(0, 0, 0, 12, 0, 0, 0), new Date(0, 0, 0, 12, 30, 0, 0)],

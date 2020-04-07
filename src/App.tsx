@@ -1,5 +1,5 @@
 import React from 'react'
-import { defaultWorkTimes, weekendDays, holidays, weekDays, DayIndex } from './config'
+import { defaultWorkTimes, weekendDays, holidays, weekDays, DayIndex, WorkTime } from './config'
 import { addDays, isEqual } from './date'
 
 const getDateWithoutTime = (datetime: Date) =>
@@ -9,7 +9,8 @@ const padNumber = (number: number, pad: number, zeros: boolean = true): string =
   if (pad < 1) {
     return String(number)
   }
-  const digits = Math.floor(Math.log10(number)) + 1
+
+  const digits = (number === 0 ? 0 : Math.floor(Math.log10(number))) + 1
   return `${Array.from({ length: pad - digits })
     .map(() => (zeros ? '0' : ' '))
     .join('')}${number}`
@@ -39,6 +40,32 @@ const DayStyle = ({
     <code title={tooltip.join(' ')} style={textColor ? { color: textColor } : undefined}>
       {children}
     </code>
+  )
+}
+
+const Time = ({ value }: { value: Date }) => (
+  <>
+    {padNumber(value.getHours(), 2)}:{padNumber(value.getMinutes(), 2)}
+  </>
+)
+
+const WorkTimes = ({ value: [[start, end], ...breaks] }: { value: WorkTime }) => {
+  return (
+    <>
+      <td>
+        <Time value={start} />
+      </td>
+      <td>
+        <Time value={end} />
+      </td>
+      <td>
+        {breaks.map(([breakStart, breakEnd]) => (
+          <React.Fragment key={`${breakStart.getHours()}-${breakStart.getMinutes()}`}>
+            <Time value={breakStart} />-<Time value={breakEnd} />
+          </React.Fragment>
+        ))}
+      </td>
+    </>
   )
 }
 
@@ -74,8 +101,6 @@ const useTouchDrag = (
     touchStart.current = null
   })
 }
-
-const workDays = Object.keys(defaultWorkTimes).map(Number)
 
 const App = () => {
   const [startDay, setStartDay] = React.useState(getDateWithoutTime(new Date()))
@@ -137,10 +162,10 @@ const App = () => {
             .map(([name]) => name)
 
           const weekDay = date.getDay() as DayIndex
-          const [workTime, ...breaks] = defaultWorkTimes[weekDay]
 
-          const isWorkday = workDays.includes(weekDay) && todaysHolidays.length === 0
+          const isWorkday = defaultWorkTimes[weekDay].length > 0 && todaysHolidays.length === 0
           const isWeekend = weekendDays.includes(weekDay)
+
           return (
             <tr
               key={`${date}`}
@@ -151,9 +176,15 @@ const App = () => {
                   <Day value={date} />
                 </DayStyle>
               </td>
-              <td></td>
-              <td></td>
-              <td></td>
+              {isWorkday ? (
+                <WorkTimes value={defaultWorkTimes[weekDay]} />
+              ) : (
+                <>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </>
+              )}
               <td>{todaysHolidays.length > 0 ? todaysHolidays.join(', ') : undefined}</td>
               <td>{isWorkday ? 'o' : undefined}</td>
               <td>{isWeekend ? 'o' : undefined}</td>
