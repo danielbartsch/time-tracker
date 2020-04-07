@@ -1,5 +1,5 @@
 import React from 'react'
-import { workDays, weekendDays, holidays, weekDays, birthdays } from './config'
+import { workDays, weekendDays, holidays, weekDays } from './config'
 import { addDays, isEqual } from './date'
 
 const getDateWithoutTime = (datetime: Date) =>
@@ -26,30 +26,17 @@ const DayStyle = ({
   children,
   date,
   todaysHolidays,
-  todaysBirthdays,
 }: {
   children: React.ReactNode
   date: Date
   todaysHolidays: Array<string>
-  todaysBirthdays: Array<[string, Date]>
 }) => {
   let textColor = undefined
   if (todaysHolidays.length > 0) {
     textColor = 'green'
   }
-  if (todaysBirthdays.length > 0) {
-    textColor = '#fc0'
-  }
 
   let tooltip = todaysHolidays.slice()
-  if (tooltip.length > 0 && todaysBirthdays.length > 0) {
-    tooltip.push('und')
-  }
-  tooltip.push(
-    ...todaysBirthdays.map(
-      ([name, birthday]) => `${name} (${date.getFullYear() - birthday.getFullYear()})`
-    )
-  )
   return (
     <code title={tooltip.join(' ')} style={textColor ? { color: textColor } : undefined}>
       {children}
@@ -129,14 +116,16 @@ const App = () => {
   })
 
   return (
-    <table style={{ width: '100%' }}>
+    <table>
       <thead>
         <tr>
-          <th style={{ width: 150 }}>Datum</th>
-          <th style={{ width: 150 }}>Feiertag</th>
-          <th>Geburtstag</th>
-          <th style={{ width: 20 }}>Werktag</th>
-          <th style={{ width: 20 }}>Wochenende</th>
+          <th>Datum</th>
+          <th>Arbeitsbeginn</th>
+          <th>Arbeitsende</th>
+          <th>Pausen</th>
+          <th>Notizen</th>
+          <th>Werktag</th>
+          <th>Wochenende</th>
         </tr>
       </thead>
       <tbody>
@@ -147,14 +136,7 @@ const App = () => {
             .filter(([, isHoliday]) => isHoliday(date))
             .map(([name]) => name)
 
-          const todaysBirthdays = birthdays.filter(
-            ([, birthday]) =>
-              birthday.getMonth() === date.getMonth() &&
-              birthday.getDate() === date.getDate() &&
-              date.getFullYear() >= birthday.getFullYear()
-          )
-
-          const isWorkday = workDays.includes(date.getDay())
+          const isWorkday = workDays.includes(date.getDay()) && todaysHolidays.length === 0
           const isWeekend = weekendDays.includes(date.getDay())
           return (
             <tr
@@ -162,26 +144,15 @@ const App = () => {
               style={isEqual(date, new Date()) ? { backgroundColor: '#343' } : undefined}
             >
               <td className="date">
-                <DayStyle
-                  date={date}
-                  todaysHolidays={todaysHolidays}
-                  todaysBirthdays={todaysBirthdays}
-                >
+                <DayStyle date={date} todaysHolidays={todaysHolidays}>
                   <Day value={date} />
                 </DayStyle>
               </td>
+              <td></td>
+              <td></td>
+              <td></td>
               <td>{todaysHolidays.length > 0 ? todaysHolidays.join(', ') : undefined}</td>
-              <td>
-                {todaysBirthdays.length > 0
-                  ? todaysBirthdays
-                      .map(
-                        ([name, birthday]) =>
-                          `${name} (${date.getFullYear() - birthday.getFullYear()})`
-                      )
-                      .join(', ')
-                  : undefined}
-              </td>
-              <td>{isWorkday && todaysHolidays.length === 0 ? 'o' : undefined}</td>
+              <td>{isWorkday ? 'o' : undefined}</td>
               <td>{isWeekend ? 'o' : undefined}</td>
             </tr>
           )
