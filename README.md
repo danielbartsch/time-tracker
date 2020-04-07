@@ -1,1 +1,1 @@
-A simple windowing calendar built with React in Typescript
+A simple windowing time tracker built with React in Typescript
