@@ -49,40 +49,46 @@ const Time = ({ value }: { value: Date }) => (
   </>
 )
 
-const WorkTimes = ({ value: [[start, end], ...breaks] }: { value: WorkTime }) => {
+type Timestamp = number
+const Duration = ({ value }: { value: Timestamp }) => {
+  const hours = value / (1000 * 60 * 60)
+  const minutes = (hours - Math.floor(hours)) * 60
   return (
     <>
-      <td>
-        <Time value={start} />
-      </td>
-      <td>
-        <Time value={end} />
-      </td>
-      <td>
-        {breaks.map(([breakStart, breakEnd]) => (
-          <React.Fragment key={`${breakStart.getHours()}-${breakStart.getMinutes()}`}>
-            <Time value={breakStart} />-<Time value={breakEnd} />
-          </React.Fragment>
-        ))}
-      </td>
-      <td>
-        <Time
-          value={
-            new Date(
-              end.getTime() -
-                start.getTime() -
-                breaks.reduce(
-                  (sum, [breakStart, breakEnd]) =>
-                    sum + (breakEnd.getTime() - breakStart.getTime()),
-                  0
-                )
-            )
-          }
-        />
-      </td>
+      {padNumber(Math.floor(hours), 2)}:{padNumber(Math.floor(minutes), 2)}h
     </>
   )
 }
+
+const WorkTimes = ({ value: [[start, end], ...breaks] }: { value: WorkTime }) => (
+  <>
+    <td>
+      <Time value={start} />
+    </td>
+    <td>
+      <Time value={end} />
+    </td>
+    <td>
+      {breaks.map(([breakStart, breakEnd]) => (
+        <React.Fragment key={`${breakStart.getHours()}-${breakStart.getMinutes()}`}>
+          <Time value={breakStart} />-<Time value={breakEnd} />
+        </React.Fragment>
+      ))}
+    </td>
+    <td>
+      <Duration
+        value={new Date(
+          end.getTime() -
+            start.getTime() -
+            breaks.reduce(
+              (sum, [breakStart, breakEnd]) => sum + (breakEnd.getTime() - breakStart.getTime()),
+              0
+            )
+        ).getTime()}
+      />
+    </td>
+  </>
+)
 
 const useEventListener = (event: string, listener: (event: any) => void) => {
   React.useEffect(() => document.addEventListener(event, listener), []) // eslint-disable-line react-hooks/exhaustive-deps
