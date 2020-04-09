@@ -37,3 +37,12 @@ td {
 td.date {
   text-align: end;
 }
+
+input[type='time'] {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: 16px;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  border: none;
+}
