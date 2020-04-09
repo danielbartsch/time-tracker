@@ -1,30 +1,11 @@
 import * as React from 'react'
-import { isEqual } from './date'
-import { holidays, weekDays, defaultWorkTimes, weekendDays, DayIndex, WorkTime } from './config'
+import { isEqual, toString } from './date'
+import { holidays, defaultWorkTimes, weekendDays, DayIndex, WorkTime } from './config'
+import { padNumber } from './utils'
 
-const padNumber = (number: number, pad: number, zeros: boolean = true): string => {
-  if (pad < 1) {
-    return String(number)
-  }
+const Day = ({ value }: { value: Date }) => <>{toString(value, 'W0. Y4-M2-D2')}</>
 
-  const digits = (number === 0 ? 0 : Math.floor(Math.log10(number))) + 1
-  return `${Array.from({ length: pad - digits })
-    .map(() => (zeros ? '0' : ' '))
-    .join('')}${number}`
-}
-
-const Day = ({ value }: { value: Date }) => (
-  <>
-    {weekDays[value.getDay()]}. {padNumber(value.getFullYear(), 4)}-
-    {padNumber(value.getMonth() + 1, 2)}-{padNumber(value.getDate(), 2)}
-  </>
-)
-
-const Time = ({ value }: { value: Date }) => (
-  <>
-    {padNumber(value.getHours(), 2)}:{padNumber(value.getMinutes(), 2)}
-  </>
-)
+const Time = ({ value }: { value: Date }) => <>{toString(value, 'h2:m2')}</>
 
 type Timestamp = number
 const Duration = ({ value }: { value: Timestamp }) => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { addDays } from './date'
+import { addDays, dateString } from './date'
 import { DateRow } from './DateRow'
 
 const getDateWithoutTime = (datetime: Date) =>
@@ -93,7 +93,7 @@ const App = () => {
       <tbody>
         {Array.from({ length: shownDays }).map((_, index) => {
           const date = addDays(startDay, index)
-          return <DateRow key={String(date)} date={date} />
+          return <DateRow key={dateString(date)} date={date} />
         })}
       </tbody>
     </table>
