@@ -1,6 +1,30 @@
 import { addDays, getEasterDate, isEqual } from './date'
 
+export const weekDaysLong = [
+  'Sonntag',
+  'Montag',
+  'Dienstag',
+  'Mittwoch',
+  'Donnerstag',
+  'Freitag',
+  'Samstag',
+  'Sonntag',
+]
 export const weekDays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+export const monthNames = [
+  'Jänner',
+  'Februar',
+  'März',
+  'April',
+  'Mai',
+  'Juni',
+  'Juli',
+  'August',
+  'September',
+  'Oktober',
+  'November',
+  'Dezember',
+]
 
 export type DayIndex = 1 | 2 | 3 | 4 | 5 | 6 | 0
 export type WorkTime = Array<[Date, Date]>

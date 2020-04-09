@@ -1,4 +1,5 @@
 import { padNumber } from './utils'
+import { monthNames, weekDays, weekDaysLong } from './config'
 
 export const addDays = (date: Date, days: number): Date => {
   var result = new Date(date)
@@ -71,3 +72,52 @@ export const toString = (date: Date, format: string): string =>
     format
   )
 
+export const fromString = (date: string, format: string): Date => {
+  const capturePositions = formatParts
+    .map(([formatPart]) => ({
+      formatPart,
+      start: format.indexOf(formatPart),
+      end: format.indexOf(formatPart) + formatPart.length,
+    }))
+    .filter(({ start }) => start > -1)
+    .sort((a, b) => a.start - b.start)
+
+  let dateString = date.slice()
+
+  const { Y4, Y2, M2, M1, MM, D2, D1, h2, h1, m2, m1, s2, s1 } = capturePositions.reduce<{
+    [key: string]: number | null
+  }>(
+    (previousDateInfo, { formatPart, start, end }) => {
+      previousDateInfo[formatPart] = Number(dateString.substring(start, end))
+      dateString = dateString.substring(0, start) + formatPart + dateString.substring(end)
+      return previousDateInfo
+    },
+    {
+      Y4: null,
+      Y2: null,
+      M2: null,
+      M1: null,
+      MM: null,
+      D2: null,
+      D1: null,
+      W0: null,
+      W9: null,
+      h2: null,
+      h1: null,
+      m2: null,
+      m1: null,
+      s2: null,
+      s1: null,
+    }
+  )
+
+  return new Date(
+    Y2 ?? Y4 ?? 0,
+    MM ?? M1 ?? M2 ?? 0,
+    D1 ?? D2 ?? 0,
+    h1 ?? h2 ?? 0,
+    m1 ?? m2 ?? 0,
+    s1 ?? s2 ?? 0,
+    0
+  )
+}
