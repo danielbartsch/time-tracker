@@ -1,7 +1,31 @@
 import * as React from 'react'
+import axios from 'axios'
 import { isEqual, toString, fromString } from './date'
 import { holidays, defaultWorkTimes, weekendDays, DayIndex, WorkTime } from './config'
 import { padNumber } from './utils'
+
+type SetState<T> = (value: T | ((value: T) => T)) => void
+export const useStateWithUpdater = <T,>(
+  initialValue: T,
+  updater: (value: T) => void,
+  delay: number
+): [T, SetState<T>] => {
+  const [stateValue, setValue] = React.useState(initialValue)
+
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      if (stateValue !== initialValue) {
+        updater(stateValue)
+      }
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [stateValue, delay, initialValue, updater])
+
+  return [stateValue, setValue]
+}
 
 const Day = ({ value }: { value: Date }) => <>{toString(value, 'W0. Y4-M2-D2')}</>
 
@@ -12,7 +36,13 @@ const TimeInput = ({ value, onChange }: { value: Date; onChange: (date: Date) =>
     <input
       type="time"
       value={toString(value, 'h2:m2')}
-      onChange={event => onChange(fromString(event.target.value, 'h2:m2'))}
+      onChange={event => {
+        const date = new Date(value)
+        const newTime = fromString(event.target.value, 'h2:m2')
+        date.setHours(newTime.getHours())
+        date.setMinutes(newTime.getMinutes())
+        onChange(date)
+      }}
       required
     />
   )
@@ -29,29 +59,50 @@ const Duration = ({ value }: { value: Timestamp }) => {
   )
 }
 
-const WorkTimes = ({ value }: { value: WorkTime }) => {
-  const [[[start, end], ...breaks], setWorkTime] = React.useState(value)
+const patchTimeWithDate = (time: Date, date: Date): Date => {
+  const newDate = new Date(time)
+  newDate.setFullYear(date.getFullYear())
+  newDate.setMonth(date.getMonth())
+  newDate.setDate(date.getDate())
+  return newDate
+}
+
+const patchWorkTime = (date: Date, workTime: WorkTime): WorkTime =>
+  workTime.map(([start, end]) => [patchTimeWithDate(start, date), patchTimeWithDate(end, date)])
+
+const WorkTimes = ({
+  value,
+  date,
+  onSave,
+}: {
+  value: WorkTime
+  date: Date
+  onSave: (workTime: WorkTime) => void
+}) => {
+  const [[[start, end], ...breaks], setWorkTime] = useStateWithUpdater<WorkTime>(
+    value,
+    onSave,
+    5000
+  )
   return (
     <>
       <td>
         <TimeInput
           value={start}
-          onChange={date =>
-            setWorkTime(previousWorkTime => [
-              [date, previousWorkTime[0][1]],
-              ...previousWorkTime.slice(1),
-            ])
+          onChange={newDate =>
+            setWorkTime(previousWorkTime =>
+              patchWorkTime(date, [[newDate, previousWorkTime[0][1]], ...previousWorkTime.slice(1)])
+            )
           }
         />
       </td>
       <td>
         <TimeInput
           value={end}
-          onChange={date =>
-            setWorkTime(previousWorkTime => [
-              [previousWorkTime[0][0], date],
-              ...previousWorkTime.slice(1),
-            ])
+          onChange={newDate =>
+            setWorkTime(previousWorkTime =>
+              patchWorkTime(date, [[previousWorkTime[0][0], newDate], ...previousWorkTime.slice(1)])
+            )
           }
         />
       </td>
@@ -98,6 +149,8 @@ const DayStyle = ({
   )
 }
 
+const saveWorkTime = (workTime: WorkTime) => axios.post('/worktime', workTime)
+
 export const DateRow = ({ date }: { date: Date }) => {
   const todaysHolidays = holidays.filter(([, isHoliday]) => isHoliday(date)).map(([name]) => name)
 
@@ -114,7 +167,7 @@ export const DateRow = ({ date }: { date: Date }) => {
         </DayStyle>
       </td>
       {isWorkday ? (
-        <WorkTimes value={defaultWorkTimes[weekDay]} />
+        <WorkTimes value={defaultWorkTimes[weekDay]} date={date} onSave={saveWorkTime} />
       ) : (
         <>
           <td></td>
