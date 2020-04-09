@@ -1,6 +1,5 @@
 import * as React from 'react'
-import axios from 'axios'
-import { isEqual, toString, fromString } from './date'
+import { isEqual, toString, fromString, dateString } from './date'
 import { holidays, defaultWorkTimes, weekendDays, DayIndex, WorkTime } from './config'
 import { padNumber } from './utils'
 
@@ -149,9 +148,30 @@ const DayStyle = ({
   )
 }
 
-const saveWorkTime = (workTime: WorkTime) => axios.post('/worktime', workTime)
+export const fetchWorkTimes = () => {
+  const workTimes: { [key: string]: Array<[string, string]> } = JSON.parse(
+    window.localStorage.getItem('workTimes') ?? '{}'
+  )
+  return Object.entries(workTimes).reduce<{ [key: string]: WorkTime }>(
+    (workTimes, [day, worktime]) => {
+      workTimes[day] = worktime.map(([start, end]) => [new Date(start), new Date(end)])
+      return workTimes
+    },
+    {}
+  )
+}
 
-export const DateRow = ({ date }: { date: Date }) => {
+const saveWorkTime = (workTime: WorkTime) => {
+  window.localStorage.setItem(
+    'workTimes',
+    JSON.stringify({
+      ...fetchWorkTimes(),
+      [dateString(workTime[0][0])]: workTime,
+    })
+  )
+}
+
+export const DateRow = ({ date, workTime }: { date: Date; workTime: WorkTime | null }) => {
   const todaysHolidays = holidays.filter(([, isHoliday]) => isHoliday(date)).map(([name]) => name)
 
   const weekDay = date.getDay() as DayIndex
@@ -167,7 +187,11 @@ export const DateRow = ({ date }: { date: Date }) => {
         </DayStyle>
       </td>
       {isWorkday ? (
-        <WorkTimes value={defaultWorkTimes[weekDay]} date={date} onSave={saveWorkTime} />
+        <WorkTimes
+          value={workTime ?? defaultWorkTimes[weekDay]}
+          date={date}
+          onSave={saveWorkTime}
+        />
       ) : (
         <>
           <td></td>

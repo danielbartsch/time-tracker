@@ -1,6 +1,6 @@
 import React from 'react'
 import { addDays, dateString } from './date'
-import { DateRow } from './DateRow'
+import { DateRow, fetchWorkTimes } from './DateRow'
 
 const getDateWithoutTime = (datetime: Date) =>
   new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate())
@@ -41,6 +41,7 @@ const useTouchDrag = (
 const App = () => {
   const [startDay, setStartDay] = React.useState(getDateWithoutTime(new Date()))
   const [shownDays, setDays] = React.useState(30)
+  const savedWorkTimes = fetchWorkTimes()
 
   useEventListener('wheel', (event: WheelEvent) => {
     if (event.deltaY !== 0) {
@@ -93,7 +94,13 @@ const App = () => {
       <tbody>
         {Array.from({ length: shownDays }).map((_, index) => {
           const date = addDays(startDay, index)
-          return <DateRow key={dateString(date)} date={date} />
+          return (
+            <DateRow
+              key={dateString(date)}
+              date={date}
+              workTime={savedWorkTimes[dateString(date)]}
+            />
+          )
         })}
       </tbody>
     </table>
