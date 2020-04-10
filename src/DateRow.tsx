@@ -115,7 +115,9 @@ const WorkTimes = ({
       <td>
         <Duration
           value={new Date(
-              [[start, end]].concat(breaks).reduce(
+            end.getTime() -
+              start.getTime() -
+              breaks.reduce(
                 (sum, [breakStart, breakEnd]) => sum + (breakEnd.getTime() - breakStart.getTime()),
                 0
               )
