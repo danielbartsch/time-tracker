@@ -50,7 +50,12 @@ const App = () => {
 
   useEventListener('wheel', (event: WheelEvent) => {
     if (event.deltaY !== 0) {
-      setStartDay(previousStartDay => addDays(previousStartDay, event.deltaY))
+      setStartDay(previousStartDay =>
+        addDays(
+          previousStartDay,
+          event.deltaY > 0 ? Math.min(event.deltaY, shownDays) : Math.max(event.deltaY, -shownDays)
+        )
+      )
     }
     if (event.deltaX !== 0) {
       setDays(prevDays => {
@@ -78,7 +83,13 @@ const App = () => {
       })
     }
     if (Math.abs(y) > 30) {
-      setStartDay(previousStartDay => addDays(previousStartDay, Math.round(-y / 30)))
+      const deltaY = Math.round(-y / 30)
+      setStartDay(previousStartDay =>
+        addDays(
+          previousStartDay,
+          deltaY > 0 ? Math.min(deltaY, shownDays) : Math.max(deltaY, -shownDays)
+        )
+      )
     }
   })
 
