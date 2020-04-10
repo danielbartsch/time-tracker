@@ -50,10 +50,12 @@ const TimeInput = ({ value, onChange }: { value: Date; onChange: (date: Date) =>
 type Timestamp = number
 const Duration = ({ value }: { value: Timestamp }) => {
   const hours = value / (1000 * 60 * 60)
-  const minutes = (hours - Math.floor(hours)) * 60
+  const fullHours = hours < 0 ? Math.ceil(hours) : Math.floor(hours)
+  const minutes = Math.abs((hours - fullHours) * 60)
   return (
     <>
-      {padNumber(Math.floor(hours), 2)}:{padNumber(Math.floor(minutes), 2)}h
+      {hours < 0 && '-'}
+      {padNumber(Math.abs(fullHours), 2)}:{padNumber(Math.round(Math.abs(minutes)), 2)}h
     </>
   )
 }
