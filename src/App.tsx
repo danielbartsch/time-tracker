@@ -6,7 +6,12 @@ const getDateWithoutTime = (datetime: Date) =>
   new Date(datetime.getFullYear(), datetime.getMonth(), datetime.getDate())
 
 const useEventListener = (event: string, listener: (event: any) => void) => {
-  React.useEffect(() => document.addEventListener(event, listener), []) // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    document.addEventListener(event, listener)
+    return () => {
+      document.removeEventListener(event, listener)
+    }
+  }, [event, listener])
 }
 
 const useTouchDrag = (
